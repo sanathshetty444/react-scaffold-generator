@@ -26,7 +26,7 @@ const fetchWithRedirects = (url) => {
 };
 async function downloadTemplate(targetDir) {
     const templateUrl =
-        "https://github.com/sanathshetty444/react-v19/releases/download/v1.0.0/react-ts-tailwind.tar.gz";
+        "https://github.com/sanathshetty444/react-scaffold-generator/releases/download/v1.0.0/react-ts-tailwind.tar.gz";
     console.log(chalk.blue("Downloading Vite React template..."));
 
     const response = await fetchWithRedirects(templateUrl);
