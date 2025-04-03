@@ -1,0 +1,21 @@
+{
+    "name": "custom-react-cra",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "module",
+    "dependencies": {
+        "chalk": "^5.4.1",
+        "commander": "^13.1.0",
+        "execa": "^9.5.2",
+        "fs-extra": "^11.3.0",
+        "inquirer": "^12.5.0",
+        "tar": "^7.4.3"
+    }
+}
