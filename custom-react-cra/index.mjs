@@ -11,41 +11,40 @@ import * as tar from "tar";
 
 const program = new Command();
 
-async function downloadTemplate(targetDir, templateName) {
-    const templateUrl = "https://codeload.github.com/vitejs/vite/tar.gz/main";
-    console.log(chalk.blue("Downloading Vite React template..."));
-
+const fetchWithRedirects = (url) => {
     return new Promise((resolve, reject) => {
-        https.get(templateUrl, (response) => {
-            if (response.statusCode !== 200) {
-                reject(
-                    new Error(
-                        `Failed to fetch template: ${response.statusCode}`
-                    )
+        https.get(url, (response) => {
+            if (response.statusCode === 302) {
+                return fetchWithRedirects(response.headers.location).then(
+                    resolve
                 );
-                return;
             }
-            response
-                .pipe(
-                    tar.x({
-                        cwd: targetDir,
-                        strip: 4,
-                        filter: (path) => {
-                            return path.split("/").includes(templateName);
-                        },
-                    })
-                )
-                .on("close", resolve)
-                .on("error", reject);
+            if (response.statusCode === 200) resolve(response);
+            else reject(response);
         });
     });
+};
+async function downloadTemplate(targetDir) {
+    const templateUrl =
+        "https://github.com/sanathshetty444/react-v19/releases/download/v1.0.0/react-ts-tailwind.tar.gz";
+    console.log(chalk.blue("Downloading Vite React template..."));
+
+    const response = await fetchWithRedirects(templateUrl);
+    if (response.statusCode !== 200) {
+        reject(new Error(`Failed to fetch template: ${response.statusCode}`));
+        return;
+    }
+    response.pipe(
+        tar.x({
+            cwd: targetDir,
+        })
+    );
 }
 
 program
     .version("1.0.0")
     .argument("<project-name>", "Name of the React project")
-    .argument("<template-name>", "Template")
-    .action(async (projectName, templateName = "template-react") => {
+    .action(async (projectName) => {
         console.log(chalk.green(`Creating React app: ${projectName}`));
 
         const targetDir = path.join(process.cwd(), projectName);
@@ -66,10 +65,11 @@ program
         console.log(chalk.blue("Setting up project..."));
         fs.mkdirSync(targetDir);
 
-        await downloadTemplate(targetDir, templateName);
+        await downloadTemplate(targetDir);
         process.chdir(targetDir);
 
         console.log(chalk.blue("Installing dependencies..."));
+        await execa(packageManager, ["install"]);
         await execa(packageManager, ["install"]);
 
         console.log(chalk.green("Project setup complete! 🎉"));
